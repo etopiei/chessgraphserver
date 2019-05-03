@@ -1,0 +1,9 @@
+[package]
+name = "chessgraphserver"
+version = "0.1.0"
+authors = ["etopiei <lj343@icloud.com>"]
+edition = "2018"
+
+[dependencies]
+iron = "0.6.*"
+rusted_cypher = "1.1.0"
