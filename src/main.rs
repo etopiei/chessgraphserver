@@ -10,8 +10,9 @@ use std::io::Read;
 use rusted_cypher::GraphClient;
 
 use iron::prelude::*;
-use iron::status;
+use iron::{Chain, status};
 use iron::mime::Mime;
+use iron_cors::CorsMiddleware;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct GameData {
@@ -28,12 +29,14 @@ fn main() {
 
         let mut fen_string: String = "".to_string();
         req.body.read_to_string(&mut fen_string).unwrap();
+        println!("FEN String: {}", fen_string);
 
         let statement = cypher_stmt!("MATCH (g:Game)-[:HAD_POSITION]->(p:Position) WHERE p.FEN = {game_fen} RETURN g.game_id, g.event, g.result LIMIT 20", {
             "game_fen" => &fen_string
         }).unwrap();
         
         let result = graph.exec(statement).unwrap();
+        println!("Games Found: {}", result.data.len());
         let mut game_data: Vec<GameData> = Vec::new();
 
         for row in result.rows() {
@@ -48,6 +51,10 @@ fn main() {
         Ok(Response::with((content_type, status::Ok, serde_json::to_string(&game_data).unwrap())))
     }
 
-    let _server = Iron::new(get_data_fen).http("localhost:3000").unwrap();
-    println!("On 3000");
+    let cors = CorsMiddleware::with_allow_any();
+
+    let mut chain = Chain::new(get_data_fen);
+    chain.link_around(cors);
+
+    let _server = Iron::new(chain).http("localhost:3000").unwrap();
 }
