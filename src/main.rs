@@ -56,5 +56,5 @@ fn main() {
     let mut chain = Chain::new(get_data_fen);
     chain.link_around(cors);
 
-    let _server = Iron::new(chain).http("localhost:3000").unwrap();
+    Iron::new(chain).http(("127.0.0.1", 3000)).unwrap();
 }
