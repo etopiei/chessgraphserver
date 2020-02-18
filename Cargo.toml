@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 iron = "0.6.*"
+router = "0.6.0"
 iron-cors = "0.8.0"
 rusted_cypher = "1.1.0"
 serde = {version = "1.0.60", features = ["derive"]}
